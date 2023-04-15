@@ -4,6 +4,11 @@
 <head>
     <title>EcoNav</title>
     <style>
+        body {
+            min-width: 800px;
+            min-height: 500px;
+        }
+
         .flex-container {
             display: flex;
             flex-direction: row;
@@ -125,7 +130,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js"></script>
     <!-- Include Google Maps Places API JavaScript -->
     <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXdI1g5CfTjBl20y0LgAwH29aVxFfOLJ4&libraries=places"></script>
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXdI1g5CfTjBl20y0LgAwH29aVxFfOLJ4&callback=Function.prototype"></script>
 </head>
 
 <body>
@@ -145,7 +150,8 @@
                 <img id="bus" src="bus.png" alt="bus" class="bus-image">
                 <p id="bus-text">Bus</p>
                 <h3>Carbon Footprint for<br>Current Trip</br></h3>
-                <p id="results">N/A mi</p>
+                <p id="first-carbon"></p>
+                <p id="second-carbon"></p>
             </div>
         </div>
         <div id="map-container">
@@ -162,6 +168,11 @@
         </div>
     </div>
     <script>
+
+        // variables for bus and car carbon values
+        var busCarbon = 0;
+        var carCarbon = 0;
+
         // Initialize the map
         var map = L.map('map').setView([37.599734, -78.487087], 7);
 
@@ -171,7 +182,7 @@
         }).addTo(map);
 
         function onCarClick() {
-            var map = new google.maps.Map(document.getElementById('map-container'), {
+            map = new google.maps.Map(document.getElementById('map-container'), {
                 center: { lat: 37.7749, lng: -122.4194 },
             });
 
@@ -201,15 +212,6 @@
                 if (status === 'OK') {
                     // Display the route on the map
                     directionsDisplay.setDirections(response);
-                    var route = response.routes[0];
-                    var distance = 0;
-                    for (var i = 0; i < route.legs.length; i++) {
-                        distance += route.legs[i].distance.value;
-                    }
-                    // Convert distance to kilometers
-                    var distanceMi = distance * 0.000621371;
-                    carCarbon = distanceMi * 371;
-                    document.getElementById("results").innerHTML = carCarbon + " g CO2";
 
                 } else {
                     window.alert('Directions request failed due to ' + status);
@@ -227,7 +229,7 @@
 
             document.getElementById('bus').style.opacity = 1;
 
-            var map = new google.maps.Map(document.getElementById('map-container'), {
+            map = new google.maps.Map(document.getElementById('map-container'), {
                 center: { lat: 37.7749, lng: -122.4194 },
             });
             // Get the search input value
@@ -251,6 +253,58 @@
                 if (status === 'OK') {
                     // Display the route on the map
                     directionsDisplay.setDirections(response);
+                } else {
+                    window.alert('Directions request failed due to ' + status);
+                }
+            });
+
+        }
+
+        function roundToNearestHundredth(number) {
+            return Math.round(number * 100) / 100;
+        }
+
+        function calculateCarbon() {
+
+            map = new google.maps.Map(document.getElementById('map-container'), {
+                center: { lat: 37.7749, lng: -122.4194 },
+            });
+            // Get the search input value
+            var start = document.getElementById('origin-input').value;
+            var end = document.getElementById('destination-input').value;
+            var directionsService = new google.maps.DirectionsService;
+            directionsService.route({
+                origin: start,
+                destination: end,
+                // travelMode: driving, transit
+                travelMode: 'DRIVING'
+            }, function (response, status) {
+                if (status === 'OK') {
+                    // Display the route on the map
+                    var route = response.routes[0];
+                    var distance = 0;
+                    for (var i = 0; i < route.legs.length; i++) {
+                        distance += route.legs[i].distance.value;
+                    }
+                    // Convert distance to kilometers
+                    var distanceMi = distance * 0.000621371;
+                    carCarbon = distanceMi * 371;
+
+                } else {
+                    window.alert('Directions request failed due to ' + status);
+                }
+            });
+            directionsService.route({
+                origin: start,
+                destination: end,
+                // travelMode: driving, transit
+                travelMode: 'TRANSIT',
+                transitOptions: {
+                    modes: ['BUS', 'TRAIN'] // Specify the transit modes you want to include
+                }
+            }, function (response, status) {
+                if (status === 'OK') {
+                    // Display the route on the map
                     var route = response.routes[0];
                     var distance = 0;
                     for (var i = 0; i < route.legs.length; i++) {
@@ -259,76 +313,21 @@
                     // Convert distance to kilometers
                     var distanceMi = distance * 0.000621371;
                     busCarbon = distanceMi * 299;
-                    document.getElementById("results").innerHTML = busCarbon + " g CO2";
+
+                    setTimeout(function () {
+                        if (busCarbon < carCarbon) {
+                            document.getElementById("first-carbon").innerHTML = "1. Bus (" + roundToNearestHundredth(busCarbon) + " g CO2)";
+                            document.getElementById("second-carbon").innerHTML = "2. Car (" + roundToNearestHundredth(carCarbon) + " g CO2)";
+                        } else {
+                            document.getElementById("first-carbon").innerHTML = "1. Car (" + roundToNearestHundredth(carCarbon) + " g CO2)";
+                            document.getElementById("second-carbon").innerHTML = "2. Bus (" + roundToNearestHundredth(busCarbon) + " g CO2)";
+                        }
+                    }, 500);
+
                 } else {
                     window.alert('Directions request failed due to ' + status);
                 }
             });
-
-            function calculateCarbon() {
-
-                var busCarbon = 0;
-                var carCarbon = 0;
-
-                var map = new google.maps.Map(document.getElementById('map-container'), {
-                    center: { lat: 37.7749, lng: -122.4194 },
-                });
-                // Get the search input value
-                var start = document.getElementById('origin-input').value;
-                var end = document.getElementById('destination-input').value;
-                var directionsService = new google.maps.DirectionsService;
-                directionsService.route({
-                    origin: start,
-                    destination: end,
-                    // travelMode: driving, transit
-                    travelMode: 'DRIVING'
-                }, function (response, status) {
-                    if (status === 'OK') {
-                        // Display the route on the map
-                        var route = response.routes[0];
-                        var distance = 0;
-                        for (var i = 0; i < route.legs.length; i++) {
-                            distance += route.legs[i].distance.value;
-                        }
-                        // Convert distance to kilometers
-                        var distanceMi = distance * 0.000621371;
-                        carCarbon = distanceMi * 371;
-
-                    } else {
-                        window.alert('Directions request failed due to ' + status);
-                    }
-                });
-                directionsService.route({
-                    origin: start,
-                    destination: end,
-                    // travelMode: driving, transit
-                    travelMode: 'TRANSIT',
-                    transitOptions: {
-                        modes: ['BUS', 'TRAIN'] // Specify the transit modes you want to include
-                    }
-                }, function (response, status) {
-                    if (status === 'OK') {
-                        // Display the route on the map
-                        var route = response.routes[0];
-                        var distance = 0;
-                        for (var i = 0; i < route.legs.length; i++) {
-                            distance += route.legs[i].distance.value;
-                        }
-                        // Convert distance to kilometers
-                        var distanceMi = distance * 0.000621371;
-                        busCarbon = distanceMi * 299;
-                    } else {
-                        window.alert('Directions request failed due to ' + status);
-                    }
-                });
-
-                if (busCarbon > carCarbon) {
-                    document.getElementById("busCarb-text").innerHTML = "1. Bus (" + busCarbon + " g CO2)\n2. Car (" + carCarbon + " g CO2)";
-                } else {
-                    document.getElementById("busCarb-text").innerHTML = "1. Car (" + carCarbon + " g CO2)\n2. Bus (" + busCarbon + " g CO2)";
-                }
-
-            }
 
         }
 
