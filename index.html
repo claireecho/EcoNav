@@ -5,7 +5,7 @@
 
     <link rel="icon" type="image/x-icon" href="favicon.png">
 
-    <title>EcoNav</title>
+    <title style="color: rgba(36, 80, 30, 0.767);">EcoNav</title>
     <style>
         @font-face {
             font-family: 'Sans Serif';
@@ -34,7 +34,7 @@
             position: relative;
             display: inline-block;
             width: 20%;
-            height: 450px;
+            height: 448px;
             border: 1px solid #000;
         }
 
@@ -112,10 +112,10 @@
         #map-container {
             display: inline-block;
             position: absolute;
-            top: 5%;
+            top: 4%;
             left: 23%;
             width: 73%;
-            height: 90%;
+            height: 91%;
             border: 1px solid #000;
         }
 
@@ -162,11 +162,12 @@
         <div class="flex-container">
             <img src="favicon.png" alt="logo"
                 style="width: 80px; height: 80px; margin-left: -30px; margin-top: -5px; margin-right: 10px;">
-            <h1>EcoNav</h1>
+            <img src="EcoNav.png" alt="EcoNav"
+                style="width: 200px; height: 40px; margin-top: 20px; margin-left: -5px; margin-right: 10px;">
         </div>
         <p><b>Initial Point: </b><input type="text" id="origin-input" placeholder="Search for a location"></p>
         <p><b>Destination: </b><input type="text" id="destination-input" placeholder="Search for a location"></p>
-        <button id="generate-button" class="generate-button" style="margin-left: 25px">
+        <button id="generate-button" class="generate-button" style="margin-left: 35px; margin-top: 5px">
             <img src="generate.png" alt="generate" style="width: 200px; margin-left: -8px; margin-top: -1px">
         </button>
         <p></p>
