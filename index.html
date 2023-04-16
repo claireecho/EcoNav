@@ -2,14 +2,20 @@
 <html>
 
 <head>
-    // hi
+
     <link rel="icon" type="image/x-icon" href="favicon.png">
 
     <title>EcoNav</title>
     <style>
+        @font-face {
+            font-family: 'Sans Serif';
+            src: url('sans-serif.ttf') format('truetype');
+        }
+
         body {
             min-width: 800px;
             min-height: 500px;
+            font-family: 'Sans Serif', sans-serif;
         }
 
         .flex-container {
@@ -28,7 +34,7 @@
             position: relative;
             display: inline-block;
             width: 20%;
-            height: 470px;
+            height: 450px;
             border: 1px solid #000;
         }
 
@@ -89,12 +95,27 @@
 
         }
 
+        .generate-button {
+            width: 200px;
+            height: 50px;
+            background: transparent;
+            align-content: center;
+            border: none;
+        }
+
+        img.generate-button {
+            width: 30px;
+            height: 30px;
+            background: transparent;
+        }
+
         #map-container {
             display: inline-block;
-            position: relative;
-            left: 25px;
+            position: absolute;
+            top: 5%;
+            left: 23%;
             width: 73%;
-            height: 470px;
+            height: 90%;
             border: 1px solid #000;
         }
 
@@ -138,10 +159,16 @@
 
 <body>
     <div id="title-container">
-        <h1>EcoNav</h1>
-        <p>Origin: <input type="text" id="origin-input" placeholder="Search for a location"></p>
-        <p>Destination: <input type="text" id="destination-input" placeholder="Search for a location"></p>
-        <button id="generate-button">Generate</button>
+        <div class="flex-container">
+            <img src="favicon.png" alt="logo"
+                style="width: 80px; height: 80px; margin-left: -30px; margin-top: -5px; margin-right: 10px;">
+            <h1>EcoNav</h1>
+        </div>
+        <p><b>Initial Point: </b><input type="text" id="origin-input" placeholder="Search for a location"></p>
+        <p><b>Destination: </b><input type="text" id="destination-input" placeholder="Search for a location"></p>
+        <button id="generate-button" class="generate-button" style="margin-left: 25px">
+            <img src="generate.png" alt="generate" style="width: 200px; margin-left: -8px; margin-top: -1px">
+        </button>
         <p></p>
     </div>
     <div class="flex-container">
@@ -152,7 +179,7 @@
                 <p id="car-text">Car</p>
                 <img id="bus" src="bus.png" alt="bus" class="bus-image">
                 <p id="bus-text">Bus</p>
-                <h3>Carbon Footprint for<br>Current Trip</br></h3>
+                <h3>Most Sustainable<br>Transportation</br></h3>
                 <p id="first-carbon"></p>
                 <p id="second-carbon"></p>
             </div>
@@ -217,7 +244,7 @@
                     directionsDisplay.setDirections(response);
 
                 } else {
-                    window.alert('Directions request failed due to ' + status);
+                    window.alert('Please type in valid locations (they have to be unique)');
                 }
             });
         }
@@ -257,7 +284,7 @@
                     // Display the route on the map
                     directionsDisplay.setDirections(response);
                 } else {
-                    window.alert('Directions request failed due to ' + status);
+                    window.alert('Please type in valid locations (they have to be unique)');
                 }
             });
 
@@ -293,8 +320,6 @@
                     var distanceMi = distance * 0.000621371;
                     carCarbon = distanceMi * 371;
 
-                } else {
-                    window.alert('Directions request failed due to ' + status);
                 }
             });
             directionsService.route({
@@ -319,16 +344,14 @@
 
                     setTimeout(function () {
                         if (busCarbon < carCarbon) {
-                            document.getElementById("first-carbon").innerHTML = "1. Bus (" + roundToNearestHundredth(busCarbon) + " g CO2)";
-                            document.getElementById("second-carbon").innerHTML = "2. Car (" + roundToNearestHundredth(carCarbon) + " g CO2)";
+                            document.getElementById("first-carbon").innerHTML = "1. Bus (" + Math.round(busCarbon) + " g CO2)";
+                            document.getElementById("second-carbon").innerHTML = "2. Car (" + Math.round(carCarbon) + " g CO2)";
                         } else {
-                            document.getElementById("first-carbon").innerHTML = "1. Car (" + roundToNearestHundredth(carCarbon) + " g CO2)";
-                            document.getElementById("second-carbon").innerHTML = "2. Bus (" + roundToNearestHundredth(busCarbon) + " g CO2)";
+                            document.getElementById("first-carbon").innerHTML = "1. Car (" + Math.round(carCarbon) + " g CO2)";
+                            document.getElementById("second-carbon").innerHTML = "2. Bus (" + Math.round(busCarbon) + " g CO2)";
                         }
-                    }, 500);
+                    }, 1000);
 
-                } else {
-                    window.alert('Directions request failed due to ' + status);
                 }
             });
 
@@ -343,12 +366,12 @@
     <script>
         function initMap() {
             // Specify your latitude and longitude
-            var myLatLng = { lat: -34.397, lng: 150.644 };
+            var myLatLng = { lat: 38.822571, lng: -99.751740 };
 
             // Create a map instance
             var map = new google.maps.Map(document.getElementById('map-container'), {
                 center: myLatLng,
-                zoom: 8
+                zoom: 4.5
             });
         }
     </script>
