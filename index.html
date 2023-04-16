@@ -48,7 +48,7 @@
 
         #overlay-buttoncontainer {
             position: absolute;
-            top: 250px;
+            top: 292px;
             left: 25px;
             right: 0;
             bottom: 0;
@@ -181,8 +181,8 @@
                 <img id="bus" src="bus.png" alt="bus" class="bus-image">
                 <p id="bus-text">Bus</p>
                 <h3>Most Sustainable<br>Transportation</br></h3>
-                <p id="first-carbon"></p>
-                <p id="second-carbon"></p>
+                <p id="first-carbon">1.</p>
+                <p id="second-carbon">2.</p>
             </div>
         </div>
         <div id="map-container">
@@ -343,18 +343,28 @@
                     var distanceMi = distance * 0.000621371;
                     busCarbon = distanceMi * 299;
 
-                    setTimeout(function () {
-                        if (busCarbon < carCarbon) {
-                            document.getElementById("first-carbon").innerHTML = "1. Bus (" + Math.round(busCarbon) + " g CO2)";
-                            document.getElementById("second-carbon").innerHTML = "2. Car (" + Math.round(carCarbon) + " g CO2)";
-                        } else {
-                            document.getElementById("first-carbon").innerHTML = "1. Car (" + Math.round(carCarbon) + " g CO2)";
-                            document.getElementById("second-carbon").innerHTML = "2. Bus (" + Math.round(busCarbon) + " g CO2)";
-                        }
-                    }, 1000);
-
                 }
             });
+
+            setTimeout(function () {
+                if (busCarbon != 0 && carCarbon != 0) {
+                    if (busCarbon < carCarbon) {
+                        document.getElementById("first-carbon").innerHTML = "1. Bus (" + Math.round(busCarbon) + " g CO2)";
+                        document.getElementById("second-carbon").innerHTML = "2. Car (" + Math.round(carCarbon) + " g CO2)";
+                    } else {
+                        document.getElementById("first-carbon").innerHTML = "1. Car (" + Math.round(carCarbon) + " g CO2)";
+                        document.getElementById("second-carbon").innerHTML = "2. Bus (" + Math.round(busCarbon) + " g CO2)";
+                    }
+                } else {
+                    if (busCarbon == 0) {
+                        document.getElementById("first-carbon").innerHTML = "1. Car (" + Math.round(carCarbon) + " g CO2)";
+                        document.getElementById("second-carbon").innerHTML = "2. Bus (No bus route available)";
+                    } else if (carCarbon == 0) {
+                        document.getElementById("first-carbon").innerHTML = "1. Bus (" + Math.round(busCarbon) + " g CO2)";
+                        document.getElementById("second-carbon").innerHTML = "2. Car (No car route available)";
+                    }
+                }
+            }, 1000);
 
         }
 
